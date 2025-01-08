@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UCC Template</title>
+  <title>Responsive High-Quality Photo Template</title>
   <style>
     body {
-    background-color:black;
       font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
@@ -27,49 +26,74 @@
   </style>
 </head>
 <body>
+  <h1>Responsive High-Quality Photo Template</h1>
   <div class="input-container">
     <input type="file" id="photoInput" accept="image/*">
     <button onclick="generateTemplate()">Generate Template</button>
     <button id="downloadButton" style="display: none;">Download</button>
   </div>
   <canvas id="outputCanvas"></canvas>
+
   <script>
     function generateTemplate() {
       const photoInput = document.getElementById("photoInput");
       const canvas = document.getElementById("outputCanvas");
       const ctx = canvas.getContext("2d");
       const downloadButton = document.getElementById("downloadButton");
+
       if (!photoInput.files || photoInput.files.length === 0) {
         alert("Please upload a photo!");
         return;
       }
+
       const photo = new Image();
       const template = new Image();
-      template.src = "template.png";
+
+      // Load the template (replace "template.jpg" with your actual template image)
+      template.src = "template.jpg";
       template.onload = () => {
-        const templateAspectRatio = template.width / template.height;
-        const canvasWidth = Math.min(window.innerWidth * 0.9, 768); 
-        const canvasHeight = canvasWidth / templateAspectRatio;
-        canvas.width = canvasWidth;
-        canvas.height = canvasHeight;
-        ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+        // Set canvas dimensions for responsiveness
+        const devicePixelRatio = window.devicePixelRatio || 1;
+        const canvasWidth = Math.min(window.innerWidth * 0.9, 768); // Maximum width: 768px
+        const canvasHeight = canvasWidth / (template.width / template.height);
+
+        // Adjust the canvas resolution for high DPI
+        canvas.width = canvasWidth * devicePixelRatio; // High-resolution width
+        canvas.height = canvasHeight * devicePixelRatio; // High-resolution height
+        canvas.style.width = `${canvasWidth}px`; // Scaled width (CSS)
+        canvas.style.height = `${canvasHeight}px`; // Scaled height (CSS)
+        ctx.scale(devicePixelRatio, devicePixelRatio); // Scale the canvas for high DPI
+
+        // Draw the template on the canvas
+        ctx.drawImage(template, 0, 0, canvasWidth, canvasHeight);
+
+        // Load and draw the uploaded photo
         const reader = new FileReader();
         reader.onload = (e) => {
           photo.src = e.target.result;
           photo.onload = () => {
-            const photoX = canvasWidth * (278 / 768); 
-            const photoY = canvasHeight * (375 / 1365); 
-            const photoWidth = canvasWidth * (450 / 768); 
-            const photoHeight = canvasHeight * (600 / 1365); 
+            // Calculate coordinates and dimensions for the photo area (responsive)
+            const photoX = canvasWidth * (278 / 768); // Adjust coordinates relative to template width
+            const photoY = canvasHeight * (375 / 1365); // Adjust coordinates relative to template height
+            const photoWidth = canvasWidth * (450 / 768); // Width relative to template width
+            const photoHeight = canvasHeight * (600 / 1365); // Height relative to template height
+
+            // Calculate scaling to fill the area while maintaining aspect ratio
             const scale = Math.max(
               photoWidth / photo.width,
               photoHeight / photo.height
             );
             const scaledWidth = photo.width * scale;
             const scaledHeight = photo.height * scale;
+
+            // Center the photo within the designated area
             const offsetX = photoX - (scaledWidth - photoWidth) / 2;
             const offsetY = photoY - (scaledHeight - photoHeight) / 2;
+
+            // Draw the scaled and centered photo
             ctx.drawImage(photo, offsetX, offsetY, scaledWidth, scaledHeight);
+
+            // Show the download button
             downloadButton.style.display = "inline-block";
             downloadButton.onclick = () => {
               const link = document.createElement("a");
