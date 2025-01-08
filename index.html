@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Responsive High-Quality Photo Template</title>
+  <title>UCC Template</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -11,6 +11,7 @@
       flex-direction: column;
       align-items: center;
       margin: 20px;
+      background-color:black;
     }
     canvas {
       border: 1px solid black;
@@ -26,7 +27,6 @@
   </style>
 </head>
 <body>
-  <h1>Responsive High-Quality Photo Template</h1>
   <div class="input-container">
     <input type="file" id="photoInput" accept="image/*">
     <button onclick="generateTemplate()">Generate Template</button>
@@ -50,7 +50,7 @@
       const template = new Image();
 
       // Load the template (replace "template.jpg" with your actual template image)
-      template.src = "template.jpg";
+      template.src = "template.png";
       template.onload = () => {
         // Set canvas dimensions for responsiveness
         const devicePixelRatio = window.devicePixelRatio || 1;
