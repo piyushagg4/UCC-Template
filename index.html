@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UCC Template</title>
+  <style>
+    body {
+    background-color:black;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px;
+    }
+    canvas {
+      border: 1px solid black;
+      max-width: 100%;
+      height: auto;
+    }
+    .input-container {
+      margin-bottom: 20px;
+    }
+    button {
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="input-container">
+    <input type="file" id="photoInput" accept="image/*">
+    <button onclick="generateTemplate()">Generate Template</button>
+    <button id="downloadButton" style="display: none;">Download</button>
+  </div>
+  <canvas id="outputCanvas"></canvas>
+  <script>
+    function generateTemplate() {
+      const photoInput = document.getElementById("photoInput");
+      const canvas = document.getElementById("outputCanvas");
+      const ctx = canvas.getContext("2d");
+      const downloadButton = document.getElementById("downloadButton");
+      if (!photoInput.files || photoInput.files.length === 0) {
+        alert("Please upload a photo!");
+        return;
+      }
+      const photo = new Image();
+      const template = new Image();
+      template.src = "template.png";
+      template.onload = () => {
+        const templateAspectRatio = template.width / template.height;
+        const canvasWidth = Math.min(window.innerWidth * 0.9, 768); 
+        const canvasHeight = canvasWidth / templateAspectRatio;
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          photo.src = e.target.result;
+          photo.onload = () => {
+            const photoX = canvasWidth * (278 / 768); 
+            const photoY = canvasHeight * (375 / 1365); 
+            const photoWidth = canvasWidth * (450 / 768); 
+            const photoHeight = canvasHeight * (600 / 1365); 
+            const scale = Math.max(
+              photoWidth / photo.width,
+              photoHeight / photo.height
+            );
+            const scaledWidth = photo.width * scale;
+            const scaledHeight = photo.height * scale;
+            const offsetX = photoX - (scaledWidth - photoWidth) / 2;
+            const offsetY = photoY - (scaledHeight - photoHeight) / 2;
+            ctx.drawImage(photo, offsetX, offsetY, scaledWidth, scaledHeight);
+            downloadButton.style.display = "inline-block";
+            downloadButton.onclick = () => {
+              const link = document.createElement("a");
+              link.download = "responsive-template.png";
+              link.href = canvas.toDataURL();
+              link.click();
+            };
+          };
+        };
+        reader.readAsDataURL(photoInput.files[0]);
+      };
+    }
+  </script>
+</body>
+</html>
